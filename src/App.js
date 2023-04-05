@@ -24,7 +24,7 @@ import cssExample from './css-example';
 import { useLocalStorage } from '@rehooks/local-storage';
 import ClipLoader from 'react-spinners/ClipLoader';
 
-const host = 'https://ssfy.sh/chrisvxd/og-impact';
+const host = 'http://localhost:3003/api';
 
 const Editor = ({ label, mode, ...props }) => (
   <div className="Editor">
@@ -69,24 +69,24 @@ const debouncedFetchPreview = debounce(
   async (data, setUri, setLoading) => {
     setLoading(true);
 
-    const response = await axios.post(`${host}/preview`, data, {
-      responseType: 'arraybuffer',
+    const response = await axios.get(`${host}/preview`, {
+      params: data,
       headers: {
         'Content-Type': 'application/json',
         Accept: 'image/*',
       },
     });
-
+    
     if (response.headers['content-type']) {
       if (response.headers['content-type'].startsWith('image/')) {
-        const b64 = new Buffer(response.data, 'binary').toString('base64');
-        const dataUri =
-          'data:' + response.headers['content-type'] + ';base64,' + b64;
-
+        const b64 = response.data.data
+      
+        const dataUri = 'data:'+ response.headers['content-type'] +';base64,' + b64;
+        
         setUri(dataUri);
       }
     }
-
+    
     setLoading(false);
   },
   1000,
@@ -133,7 +133,7 @@ const Preview = ({ html, css, params }) => {
       setCompiledHtml(debouncedHtml);
     }
   }, [debouncedHtml, debouncedParams]);
-
+  
   return (
     <div className="Preview">
       <div className="Preview-item">
@@ -231,12 +231,12 @@ const App = () => {
   const [apiKey, setApiKey] = useState('');
 
   const publish = useCallback(async () => {
-    if (!apiKey) {
-      alert('Please provide your API key before publishing a template.');
+    // if (!apiKey) {
+    //   alert('Please provide your API key before publishing a template.');
 
-      return;
-    }
-
+    //   return;
+    // }
+    
     try {
       const response = await axios.post(
         `${host}/publish`,
@@ -244,12 +244,12 @@ const App = () => {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: apiKey,
+            // Authorization: apiKey,
           },
         }
       );
 
-      alert(`Save successful. Use template ID ${response.data.template}.`);
+      alert(`Publish successful. ${response.data.message}.`);
     } catch (e) {
       alert(
         'Publish was unsuccessful. Please ensure you are providing a valid API key.'
