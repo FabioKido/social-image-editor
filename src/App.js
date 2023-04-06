@@ -6,7 +6,7 @@ import SplitPane from 'react-split-pane';
 import Frame from 'react-frame-component';
 import debounce from 'lodash.debounce';
 import axios from 'axios';
-import handlebars from 'handlebars';
+import handlebars from 'handlebars/dist/cjs/handlebars';
 
 import 'ace-builds/src-noconflict/mode-html';
 import 'ace-builds/src-noconflict/mode-css';
@@ -30,6 +30,7 @@ const Editor = ({ label, mode, ...props }) => (
   <div className="Editor">
     <div className="Editor-title">{label}</div>
     <AceEditor
+      setOptions={{ useWorker: false }}
       mode={mode}
       theme="monokai"
       name={`${mode.toUpperCase()}Editor`}
@@ -228,7 +229,7 @@ const App = () => {
     storedParams || { title: 'Hello, World!' }
   );
   const [paramsJson, setParamsJson] = useState(JSON.stringify(params, null, 2));
-  const [apiKey, setApiKey] = useState('');
+  //const [apiKey, setApiKey] = useState('');
 
   const publish = useCallback(async () => {
     // if (!apiKey) {
@@ -256,7 +257,7 @@ const App = () => {
       );
       console.log(e);
     }
-  }, [html, css, apiKey]);
+  }, [html, css]); // apiKey here
 
   useEffect(() => {
     debouncedWriteQueryParams(html, css, params);
@@ -286,7 +287,7 @@ const App = () => {
           </div>
 
           <div className="Header-action">
-            <input
+            {/* <input
               type="text"
               placeholder="API Key"
               value={apiKey}
@@ -299,7 +300,7 @@ const App = () => {
                 width: 200,
                 marginRight: 16,
               }}
-            />
+            /> */}
             <Button onClick={publish}>Publish to ogi.sh</Button>
           </div>
         </div>
